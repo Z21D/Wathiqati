@@ -16,6 +16,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { brand } from "@/lib/brand";
 
 const initialState: AuthActionState = {};
 
@@ -29,7 +30,7 @@ export function LoginForm({ googleEnabled = false }: { googleEnabled?: boolean }
     <Card className="w-full max-w-md">
       <CardHeader>
         <CardTitle>Welcome back</CardTitle>
-        <CardDescription>Sign in to your ExpiryGuard account</CardDescription>
+        <CardDescription>Sign in to your {brand.name} account</CardDescription>
       </CardHeader>
       <CardContent>
         {googleEnabled && (

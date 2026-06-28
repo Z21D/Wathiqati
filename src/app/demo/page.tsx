@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Logo } from "@/components/ui/logo";
 import { ButtonLink } from "@/components/ui/button";
 import { StatusBadge } from "@/components/dashboard/status-badge";
+import { brand } from "@/lib/brand";
 
 export const metadata: Metadata = {
   title: "Demo",
@@ -77,7 +78,7 @@ export default function DemoPage() {
             Interactive sample
           </p>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-5xl">
-            Explore ExpiryGuard without registering.
+            Explore {brand.name} without registering.
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-white/70">
             This demo uses static sample data only. No records are created and no

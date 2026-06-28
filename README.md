@@ -1,6 +1,6 @@
-# ExpiryGuard
+# Wathiqati
 
-ExpiryGuard is a modern SaaS for tracking company document expiry dates, surfacing in-app alerts, importing Excel sheets, and sending email reminders.
+Wathiqati (وثيقتي, "My Document") is a modern SaaS for tracking company document expiry dates, surfacing in-app alerts, importing Excel sheets, and sending email reminders.
 
 ## Features
 
@@ -109,7 +109,7 @@ Email reminders can be configured per user in Settings. The default schedule is:
 Duplicate emails are prevented with `NotificationLog.reminderKey`, so the same document/user/reminder milestone is only sent once.
 
 Production reminders are sent to `User.notificationEmail` when configured.
-If no override is set, ExpiryGuard falls back to the authenticated account
+If no override is set, Wathiqati falls back to the authenticated account
 email (`User.email`). The local `RESEND_TEST_TO` variable is used only by the
 sample test command.
 
@@ -147,6 +147,10 @@ This command sends a standalone sample email and does not create fake documents 
 
 ## Branding
 
-Customer-facing product name: **ExpiryGuard**
+Customer-facing product name: **Wathiqati**
+
+Arabic name: **وثيقتي**
+
+Meaning: **My Document**
 
 Internal package/folder names may still use legacy `permit-guard` identifiers.

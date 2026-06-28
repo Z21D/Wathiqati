@@ -13,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { brand } from "@/lib/brand";
 
 export function RegisterForm({
   initialEmail = "",
@@ -65,7 +66,7 @@ export function RegisterForm({
       <CardHeader>
         <CardTitle>Create your account</CardTitle>
         <CardDescription>
-          Start managing document expiry with ExpiryGuard
+          Start managing document expiry with {brand.name}
         </CardDescription>
       </CardHeader>
       <CardContent>

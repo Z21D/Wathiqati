@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Logo } from "@/components/ui/logo";
 import { ButtonLink } from "@/components/ui/button";
+import { brand } from "@/lib/brand";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
@@ -27,7 +28,7 @@ export default function TermsPage() {
           </h1>
           <div className="mt-8 space-y-7">
             <Section title="Use of Service">
-              ExpiryGuard provides document expiry tracking, import, alert, and
+              {brand.name} provides document expiry tracking, import, alert, and
               reminder tools. You are responsible for the accuracy of uploaded
               data and for reviewing reminders before taking compliance action.
             </Section>

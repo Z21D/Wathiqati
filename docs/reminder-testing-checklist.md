@@ -18,7 +18,7 @@ Required `.env` values:
 ```bash
 DATABASE_URL="..."
 RESEND_API_KEY="..."
-RESEND_FROM_EMAIL="ExpiryGuard <onboarding@resend.dev>"
+RESEND_FROM_EMAIL="Wathiqati <onboarding@resend.dev>"
 CRON_SECRET="..."
 ```
 

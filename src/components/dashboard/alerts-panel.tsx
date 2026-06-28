@@ -74,8 +74,8 @@ export function AlertsPanel({
                       {alert.message}
                     </p>
                     <p className="mt-2 text-xs font-medium text-ink-tertiary">
-                      Expires {formatDate(alert.expiresAt)} · {alert.remainingDays} day
-                      {alert.remainingDays === 1 ? "" : "s"} remaining
+                      Expires {formatDate(alert.expiresAt)} ·{" "}
+                      {formatRemainingDays(alert.remainingDays)}
                     </p>
                   </div>
                 </li>
@@ -98,4 +98,13 @@ export function AlertsPanel({
 
 function cnList(compact: boolean) {
   return compact ? "space-y-3 max-h-96 overflow-y-auto pr-1" : "space-y-3";
+}
+
+function formatRemainingDays(days: number) {
+  if (days < 0) {
+    const overdueDays = Math.abs(days);
+    return `${days} day${overdueDays === 1 ? "" : "s"} remaining`;
+  }
+
+  return `${days} day${days === 1 ? "" : "s"} remaining`;
 }

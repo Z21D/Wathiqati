@@ -18,14 +18,32 @@ export function getExpiryStatus(
 ): ExpiryStatus {
   const days = daysUntil(expiresAt, now);
 
-  if (days < 0) return "EXPIRED";
-  if (days <= URGENT_DAYS) return "URGENT";
-  if (days <= NEAR_EXPIRY_DAYS) return "EXPIRING_SOON";
-  return "VALID";
+  return getDocumentStatus(days);
 }
 
 export function getRemainingDays(expiresAt: Date | string, now: Date = new Date()): number {
   return daysUntil(expiresAt, now);
+}
+
+export function getDocumentStatus(
+  daysRemaining: number
+): ExpiryStatus {
+  if (daysRemaining < 0) return "EXPIRED";
+  if (daysRemaining <= URGENT_DAYS) return "URGENT";
+  if (daysRemaining <= NEAR_EXPIRY_DAYS) return "EXPIRING_SOON";
+  return "VALID";
+}
+
+export function getDocumentStatusDetails(
+  document: { expiresAt: Date | string },
+  now: Date = new Date()
+) {
+  const remainingDays = getRemainingDays(document.expiresAt, now);
+
+  return {
+    status: getDocumentStatus(remainingDays),
+    remainingDays,
+  };
 }
 
 export function needsAlert(status: ExpiryStatus): boolean {

@@ -6,7 +6,7 @@ import { auth } from "@/lib/auth";
 import { getOrganizationForUser } from "@/lib/org";
 import {
   buildDocumentAlerts,
-  countByStatus,
+  getDashboardCounts,
   getDocumentsForOrganization,
   getDocumentPersonName,
   getRecentImports,
@@ -39,7 +39,7 @@ export default async function DashboardPage() {
     ? await getRecentImports(membership.organizationId)
     : [];
 
-  const counts = countByStatus(documents);
+  const counts = getDashboardCounts(documents);
   const alerts = buildDocumentAlerts(documents);
   const priorityCounts = getTopPriorityCounts(alerts);
   const upcoming = getUpcomingExpiries(documents, 8);
@@ -110,7 +110,7 @@ export default async function DashboardPage() {
                                     {formatDate(document.expiresAt)}
                                   </p>
                                   <p className="text-xs text-ink-tertiary">
-                                    {document.remainingDays} days left
+                                    {document.remainingDays} days remaining
                                   </p>
                                 </div>
                                 <StatusBadge status={document.status} />

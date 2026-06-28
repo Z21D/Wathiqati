@@ -3,8 +3,7 @@ import { prisma } from "@/lib/prisma";
 import {
   alertMessage,
   alertPriority,
-  getExpiryStatus,
-  getRemainingDays,
+  getDocumentStatusDetails,
   needsAlert,
   type ExpiryStatus,
 } from "@/lib/document-status";
@@ -30,8 +29,7 @@ export function getDocumentPersonName(document: DocumentWithCompany) {
 }
 
 export function enrichDocument(document: DocumentWithCompany, now: Date = new Date()) {
-  const status = getExpiryStatus(document.expiresAt, now);
-  const remainingDays = getRemainingDays(document.expiresAt, now);
+  const { status, remainingDays } = getDocumentStatusDetails(document, now);
 
   return {
     ...document,
@@ -47,7 +45,7 @@ export function buildDocumentAlerts(
 ): DocumentAlert[] {
   return documents
     .map((document) => {
-      const status = getExpiryStatus(document.expiresAt, now);
+      const { status, remainingDays } = getDocumentStatusDetails(document, now);
       if (!needsAlert(status)) return null;
 
       const alert: DocumentAlert = {
@@ -58,7 +56,7 @@ export function buildDocumentAlerts(
         referenceId: document.referenceId,
         expiresAt: document.expiresAt,
         status,
-        remainingDays: getRemainingDays(document.expiresAt, now),
+        remainingDays,
         alertKey: status,
         message: alertMessage(
           document.documentType,
@@ -74,7 +72,10 @@ export function buildDocumentAlerts(
     .sort((a, b) => alertPriority(a.status) - alertPriority(b.status));
 }
 
-export function countByStatus(documents: DocumentWithCompany[], now: Date = new Date()) {
+export function getDashboardCounts(
+  documents: DocumentWithCompany[],
+  now: Date = new Date()
+) {
   const counts = {
     total: documents.length,
     valid: 0,
@@ -84,7 +85,7 @@ export function countByStatus(documents: DocumentWithCompany[], now: Date = new 
   };
 
   for (const document of documents) {
-    const status = getExpiryStatus(document.expiresAt, now);
+    const { status } = getDocumentStatusDetails(document, now);
     switch (status) {
       case "VALID":
         counts.valid++;
@@ -99,6 +100,16 @@ export function countByStatus(documents: DocumentWithCompany[], now: Date = new 
         counts.expired++;
         break;
     }
+  }
+
+  const categoryTotal =
+    counts.valid + counts.expiringSoon + counts.urgent + counts.expired;
+  if (categoryTotal !== counts.total) {
+    console.error("Dashboard counts are inconsistent.", {
+      totalDocuments: counts.total,
+      categoryTotal,
+      counts,
+    });
   }
 
   return counts;
@@ -119,7 +130,6 @@ export function getUpcomingExpiries(
 ) {
   return documents
     .map((document) => enrichDocument(document, now))
-    .filter((document) => document.status !== "EXPIRED")
     .sort((a, b) => a.remainingDays - b.remainingDays)
     .slice(0, limit);
 }

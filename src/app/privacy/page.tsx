@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Logo } from "@/components/ui/logo";
 import { ButtonLink } from "@/components/ui/button";
+import { brand } from "@/lib/brand";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -10,7 +11,7 @@ export default function PrivacyPage() {
   return (
     <LegalPage title="Privacy Policy" updated="June 26, 2026">
       <Section title="Overview">
-        ExpiryGuard helps organizations track document expirations and compliance
+        {brand.name} helps organizations track document expirations and compliance
         reminders. We collect only the information required to provide account,
         document tracking, import, and notification functionality.
       </Section>
@@ -33,7 +34,7 @@ export default function PrivacyPage() {
         authenticated account email. You can disable reminders in Settings.
       </Section>
       <Section title="Contact">
-        For privacy requests, contact your ExpiryGuard workspace administrator.
+        For privacy requests, contact your {brand.name} workspace administrator.
       </Section>
     </LegalPage>
   );

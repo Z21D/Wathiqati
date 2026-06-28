@@ -29,7 +29,7 @@ export default async function HomePage() {
         <section className="page-shell py-20 sm:py-28">
           <div className="mx-auto max-w-4xl text-center">
             <p className="mb-5 inline-flex rounded-full bg-white px-4 py-1.5 text-sm font-medium text-brand-700 shadow-soft ring-1 ring-[#e5e5ea]">
-              Document expiry, beautifully organized
+              Smart document expiry, beautifully organized
             </p>
             <h1 className="text-balance text-4xl font-semibold tracking-tight text-ink sm:text-6xl">
               {brand.tagline}
@@ -137,7 +137,7 @@ export default async function HomePage() {
 
       <footer className="border-t border-[#e5e5ea]/80 py-8 text-center text-sm text-ink-tertiary">
         <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
-          <span>© {new Date().getFullYear()} ExpiryGuard. All rights reserved.</span>
+          <span>© {new Date().getFullYear()} {brand.name}. All rights reserved.</span>
           <Link href="/privacy" className="hover:text-ink">
             Privacy
           </Link>

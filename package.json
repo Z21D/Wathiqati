@@ -2,7 +2,7 @@
   "name": "permit-guard",
   "version": "0.1.0",
   "private": true,
-  "description": "ExpiryGuard - Document expiry tracking SaaS",
+  "description": "Wathiqati - Document expiry tracking SaaS",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",

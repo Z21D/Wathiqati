@@ -1,23 +1,25 @@
 export const brand = {
-  name: "ExpiryGuard",
-  shortName: "EG",
-  tagline: "Never miss a permit expiration again.",
+  name: "Wathiqati",
+  arabicName: "وثيقتي",
+  meaning: "My Document",
+  shortName: "WQ",
+  tagline: "Never miss a document expiry again.",
   description:
-    "Automated workforce compliance for modern companies.",
+    "Smart workforce compliance and document expiry reminders for modern companies.",
   extendedDescription:
-    "Track company document expiry dates, get alerts, and import Excel sheets in seconds.",
+    "Smart workforce compliance and document expiry reminders for modern companies.",
   logo: {
-    text: "EG",
+    text: "WQ",
   },
   colors: {
     brand: "#0c8ce9",
     ink: "#1d1d1f",
     surface: "#f5f5f7",
   },
-  favicon: "/favicon.ico",
+  favicon: "/favicon.svg",
   metadata: {
-    title: "ExpiryGuard",
-    template: "%s | ExpiryGuard",
+    title: "Wathiqati",
+    template: "%s | Wathiqati",
   },
 } as const;
 

@@ -12,7 +12,7 @@ export function getResendClient() {
 }
 
 export function getFromEmail() {
-  return process.env.RESEND_FROM_EMAIL ?? "ExpiryGuard <onboarding@resend.dev>";
+  return process.env.RESEND_FROM_EMAIL ?? `${APP_NAME} <onboarding@resend.dev>`;
 }
 
 export function getAppUrl() {

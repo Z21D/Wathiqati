@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { APP_DESCRIPTION, APP_NAME } from "@/lib/brand";
+import { APP_DESCRIPTION, APP_NAME, brand } from "@/lib/brand";
 import { ToastProvider } from "@/components/ui/toast-provider";
 import "./globals.css";
 
@@ -20,6 +20,23 @@ export const metadata: Metadata = {
     template: `%s | ${APP_NAME}`,
   },
   description: APP_DESCRIPTION,
+  applicationName: APP_NAME,
+  icons: {
+    icon: brand.favicon,
+    shortcut: brand.favicon,
+    apple: brand.favicon,
+  },
+  openGraph: {
+    title: APP_NAME,
+    description: APP_DESCRIPTION,
+    siteName: APP_NAME,
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: APP_NAME,
+    description: APP_DESCRIPTION,
+  },
 };
 
 export default function RootLayout({
