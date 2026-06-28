@@ -1,0 +1,53 @@
+import "dotenv/config";
+import { Resend } from "resend";
+
+const to = process.argv[2] ?? process.env.RESEND_TEST_TO;
+const apiKey = process.env.RESEND_API_KEY;
+const from = process.env.RESEND_FROM_EMAIL ?? "ExpiryGuard <onboarding@resend.dev>";
+const appUrl = process.env.AUTH_URL ?? "http://localhost:3000";
+
+if (!apiKey) {
+  console.error("Missing RESEND_API_KEY in .env");
+  process.exit(1);
+}
+
+if (!to) {
+  console.error("Usage: npm run email:test -- you@example.com");
+  console.error("Or set RESEND_TEST_TO in .env");
+  process.exit(1);
+}
+
+const resend = new Resend(apiKey);
+
+const result = await resend.emails.send({
+  from,
+  to,
+  subject: "[ExpiryGuard] Sample reminder email",
+  html: `
+    <div style="margin:0;background:#f5f5f7;padding:32px 16px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+      <div style="max-width:620px;margin:0 auto;background:#ffffff;border:1px solid #e5e5ea;border-radius:28px;padding:32px;box-shadow:0 12px 40px rgba(0,0,0,0.08);">
+        <p style="margin:0 0 12px;color:#86868b;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;">Sample reminder</p>
+        <h1 style="margin:0;color:#1d1d1f;font-size:28px;line-height:1.2;">Document expiry alert</h1>
+        <p style="margin:16px 0 0;color:#6e6e73;line-height:1.6;font-size:16px;">This is a development test email from ExpiryGuard. Your Resend configuration is working if you received this message.</p>
+        <div style="margin:28px 0;padding:20px;border-radius:20px;background:#f5f5f7;">
+          <p style="margin:0;color:#1d1d1f;"><strong>Employee:</strong> Sample Employee</p>
+          <p style="margin:10px 0 0;color:#1d1d1f;"><strong>Company:</strong> Sample Company</p>
+          <p style="margin:10px 0 0;color:#1d1d1f;"><strong>Document:</strong> Compliance Certificate</p>
+          <p style="margin:10px 0 0;color:#1d1d1f;"><strong>Number:</strong> SAMPLE-001</p>
+          <p style="margin:10px 0 0;color:#1d1d1f;"><strong>Days remaining:</strong> 7</p>
+          <p style="margin:10px 0 0;color:#1d1d1f;"><strong>Status:</strong> URGENT</p>
+        </div>
+        <a href="${appUrl}/dashboard/reminders" style="display:inline-block;background:#1d1d1f;color:white;text-decoration:none;padding:13px 18px;border-radius:999px;font-weight:600;">Open ExpiryGuard</a>
+        <p style="margin:28px 0 0;color:#86868b;font-size:12px;line-height:1.5;">This command does not create fake documents or write reminder logs.</p>
+      </div>
+    </div>
+  `,
+});
+
+if (result.error) {
+  console.error("Resend error:", result.error);
+  process.exit(1);
+}
+
+console.log("Sample email sent successfully.");
+console.log("Resend id:", result.data?.id ?? "unknown");
