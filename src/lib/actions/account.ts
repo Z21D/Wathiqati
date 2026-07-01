@@ -1,6 +1,7 @@
 "use server";
 
 import { auth, signOut } from "@/lib/auth";
+import { sendAccountDeletedEmail } from "@/lib/email/send-account-deleted";
 import { prisma } from "@/lib/prisma";
 
 export type DeleteAccountActionState = {
@@ -28,6 +29,8 @@ export async function deleteAccountAction(
         where: { id: userId },
         select: {
           id: true,
+          email: true,
+          name: true,
           memberships: {
             select: {
               role: true,
@@ -89,6 +92,21 @@ export async function deleteAccountAction(
       await tx.organizationMember.deleteMany({ where: { userId } });
       await tx.account.deleteMany({ where: { userId } });
       await tx.session.deleteMany({ where: { userId } });
+
+      const deletedAt = new Date();
+      const emailResult = await sendAccountDeletedEmail({
+        email: user.email,
+        name: user.name,
+        deletedAt,
+      });
+
+      if (!emailResult.sent) {
+        console.error("Account deletion confirmation email failed", {
+          userId,
+          reason: emailResult.reason,
+        });
+      }
+
       await tx.user.delete({ where: { id: userId } });
     });
   } catch (error) {
