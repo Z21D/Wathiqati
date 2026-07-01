@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { DashboardHeader } from "@/components/dashboard/header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { NotificationSettingsForm } from "@/components/settings/notification-settings-form";
+import { DangerZone } from "@/components/settings/danger-zone";
 
 export const metadata: Metadata = {
   title: "Settings",
@@ -90,6 +91,10 @@ export default async function SettingsPage() {
             />
           </CardContent>
         </Card>
+
+        <div className="lg:col-span-2">
+          <DangerZone />
+        </div>
       </div>
     </>
   );

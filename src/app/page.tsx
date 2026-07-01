@@ -1,10 +1,12 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 import { ArrowRight, BarChart3, BellRing, CheckCircle2, Upload } from "lucide-react";
 import { brand } from "@/lib/brand";
 import { Logo } from "@/components/ui/logo";
 import { ButtonLink } from "@/components/ui/button";
 import Link from "next/link";
+import { AccountDeletedToast } from "@/components/account/account-deleted-toast";
 
 export default async function HomePage() {
   const session = await auth();
@@ -15,6 +17,10 @@ export default async function HomePage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-surface-muted">
+      <Suspense fallback={null}>
+        <AccountDeletedToast />
+      </Suspense>
+
       <header className="sticky top-0 z-20 border-b border-[#e5e5ea]/80 bg-white/75 backdrop-blur-xl">
         <div className="page-shell flex h-16 items-center justify-between">
           <Logo />
