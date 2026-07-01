@@ -14,6 +14,7 @@ const notificationSettingsSchema = z.object({
   emailRemindersEnabled: z.boolean(),
   reminderSchedule: z.string().min(1, "Select at least one reminder"),
   expiredReminderFrequency: z.enum(["once", "daily"]).default("once"),
+  healthyReportFrequency: z.enum(["daily", "weekly"]).default("weekly"),
 });
 
 export type SettingsActionState = {
@@ -44,6 +45,10 @@ export async function updateNotificationSettingsAction(
       formData.get("expiredReminderFrequency")?.toString() === "daily"
         ? "daily"
         : "once",
+    healthyReportFrequency:
+      formData.get("healthyReportFrequency")?.toString() === "daily"
+        ? "daily"
+        : "weekly",
   });
 
   if (!parsed.success) {
@@ -56,6 +61,7 @@ export async function updateNotificationSettingsAction(
     emailRemindersEnabled,
     reminderSchedule,
     expiredReminderFrequency,
+    healthyReportFrequency,
   } = parsed.data;
 
   try {
@@ -67,6 +73,7 @@ export async function updateNotificationSettingsAction(
         emailRemindersEnabled,
         reminderSchedule,
         expiredReminderFrequency,
+        healthyReportFrequency,
       },
     });
 

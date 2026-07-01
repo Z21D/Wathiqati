@@ -22,6 +22,7 @@ export default async function SettingsPage() {
       emailRemindersEnabled: true,
       reminderSchedule: true,
       expiredReminderFrequency: true,
+      healthyReportFrequency: true,
     },
   });
 
@@ -64,6 +65,12 @@ export default async function SettingsPage() {
                   : "Send once"
               }
             />
+            <SettingRow
+              label="Healthy-status reports"
+              value={
+                user?.healthyReportFrequency === "daily" ? "Daily" : "Weekly"
+              }
+            />
           </CardContent>
         </Card>
 
@@ -79,6 +86,7 @@ export default async function SettingsPage() {
               emailRemindersEnabled={user?.emailRemindersEnabled ?? true}
               reminderSchedule={user?.reminderSchedule ?? "30,14,7,3,1,expired"}
               expiredReminderFrequency={user?.expiredReminderFrequency ?? "once"}
+              healthyReportFrequency={user?.healthyReportFrequency ?? "weekly"}
             />
           </CardContent>
         </Card>

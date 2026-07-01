@@ -18,6 +18,7 @@ export function NotificationSettingsForm({
   emailRemindersEnabled,
   reminderSchedule,
   expiredReminderFrequency = "once",
+  healthyReportFrequency = "weekly",
 }: {
   companyName?: string | null;
   accountEmail: string;
@@ -25,6 +26,7 @@ export function NotificationSettingsForm({
   emailRemindersEnabled: boolean;
   reminderSchedule: string;
   expiredReminderFrequency?: string | null;
+  healthyReportFrequency?: string | null;
 }) {
   const [state, formAction, pending] = useActionState(
     updateNotificationSettingsAction,
@@ -128,6 +130,49 @@ export function NotificationSettingsForm({
                   name="expiredReminderFrequency"
                   value={value}
                   defaultChecked={(expiredReminderFrequency ?? "once") === value}
+                  className="h-4 w-4 border-[#d2d2d7] text-brand-600 focus:ring-brand-500"
+                />
+                {label}
+              </span>
+              <span className="mt-1 block pl-6 text-xs leading-relaxed">
+                {description}
+              </span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-3xl bg-white p-4 ring-1 ring-[#e5e5ea]">
+        <p className="text-xs font-medium uppercase tracking-wide text-ink-tertiary">
+          Healthy-status reports
+        </p>
+        <p className="mt-2 text-sm leading-relaxed text-ink-secondary">
+          When every document is valid, we send a “good standing” summary. Choose
+          how often you want to receive it.
+        </p>
+        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+          {[
+            [
+              "weekly",
+              "Weekly",
+              "One summary each week (Monday) when everything is compliant.",
+            ],
+            [
+              "daily",
+              "Daily",
+              "A daily confirmation that nothing needs attention.",
+            ],
+          ].map(([value, label, description]) => (
+            <label
+              key={value}
+              className="rounded-2xl bg-surface-subtle px-3 py-3 text-sm text-ink-secondary"
+            >
+              <span className="flex items-center gap-2 font-medium text-ink">
+                <input
+                  type="radio"
+                  name="healthyReportFrequency"
+                  value={value}
+                  defaultChecked={(healthyReportFrequency ?? "weekly") === value}
                   className="h-4 w-4 border-[#d2d2d7] text-brand-600 focus:ring-brand-500"
                 />
                 {label}

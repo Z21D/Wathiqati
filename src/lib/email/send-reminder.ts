@@ -92,12 +92,16 @@ export async function sendExpiryReminderEmail(input: {
   `;
 
   try {
-    await resend.emails.send({
+    const result = await resend.emails.send({
       from: getFromEmail(),
       to: input.userEmail,
       subject,
       html,
     });
+
+    if (result.error) {
+      throw new Error(result.error.message);
+    }
 
     await prisma.notificationLog.create({
       data: {
