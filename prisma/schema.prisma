@@ -71,6 +71,7 @@ model Organization {
   id        String               @id @default(cuid())
   name      String
   slug      String               @unique
+  isTestData Boolean             @default(false)
   members   OrganizationMember[]
   companies Company[]
   documents Document[]

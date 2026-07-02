@@ -38,6 +38,8 @@ export async function GET(request: Request) {
   const now = new Date();
 
   const organizations = await prisma.organization.findMany({
+    where:
+      process.env.NODE_ENV === "production" ? { isTestData: false } : undefined,
     include: {
       members: {
         include: {

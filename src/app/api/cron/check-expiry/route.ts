@@ -22,6 +22,10 @@ export async function GET(request: Request) {
   }
 
   const memberships = await prisma.organizationMember.findMany({
+    where:
+      process.env.NODE_ENV === "production"
+        ? { organization: { isTestData: false } }
+        : undefined,
     include: {
       user: {
         select: {

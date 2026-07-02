@@ -19,6 +19,7 @@
     "reminders:test:simulate-next-expired-day": "node scripts/reminder-scenarios.mjs simulate-next-expired-day",
     "reminders:test:inspect": "node scripts/reminder-scenarios.mjs inspect",
     "reminders:test:cleanup": "node scripts/reminder-scenarios.mjs cleanup",
+    "reminders:test:verify-clean": "node scripts/reminder-scenarios.mjs verify-clean",
     "postinstall": "prisma generate"
   },
   "dependencies": {
