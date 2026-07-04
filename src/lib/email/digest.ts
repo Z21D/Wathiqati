@@ -1,5 +1,10 @@
 import { prisma } from "@/lib/prisma";
-import { APP_NAME, getFromEmail, getResendClient } from "@/lib/email/client";
+import {
+  APP_NAME,
+  getEmailProviderConfigurationError,
+  getFromEmail,
+  sendEmail,
+} from "@/lib/email/client";
 import {
   buildDocumentAlerts,
   getDashboardCounts,
@@ -194,9 +199,9 @@ export async function sendOrganizationDigest(input: {
   now?: Date;
 }): Promise<{ sent: boolean; kind: "digest" | "healthy" | "none"; reason?: string }> {
   const now = input.now ?? new Date();
-  const resend = getResendClient();
-  if (!resend) {
-    return { sent: false, kind: "none", reason: "RESEND_API_KEY not configured" };
+  const configurationError = getEmailProviderConfigurationError();
+  if (configurationError) {
+    return { sent: false, kind: "none", reason: configurationError };
   }
 
   const isHealthy = !input.digest.hasIssues;
@@ -238,16 +243,12 @@ export async function sendOrganizationDigest(input: {
         });
 
   try {
-    const result = await resend.emails.send({
+    await sendEmail({
       from: getFromEmail(),
       to: input.recipientEmail,
       subject,
       html,
     });
-
-    if (result.error) {
-      throw new Error(result.error.message);
-    }
 
     await prisma.notificationLog.create({
       data: {

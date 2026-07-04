@@ -1,4 +1,9 @@
-import { APP_NAME, getFromEmail, getResendClient } from "@/lib/email/client";
+import {
+  APP_NAME,
+  getEmailProviderConfigurationError,
+  getFromEmail,
+  sendEmail,
+} from "@/lib/email/client";
 import { dashboardUrl, emailLayout } from "@/lib/email/templates";
 
 export async function sendWelcomeEmail(input: {
@@ -6,9 +11,9 @@ export async function sendWelcomeEmail(input: {
   email: string;
   organizationName?: string | null;
 }): Promise<{ sent: boolean; reason?: string }> {
-  const resend = getResendClient();
-  if (!resend) {
-    return { sent: false, reason: "RESEND_API_KEY not configured" };
+  const configurationError = getEmailProviderConfigurationError();
+  if (configurationError) {
+    return { sent: false, reason: configurationError };
   }
 
   const firstName = input.name?.trim().split(/\s+/)[0] || "there";
@@ -37,24 +42,17 @@ export async function sendWelcomeEmail(input: {
   });
 
   try {
-    const result = await resend.emails.send({
+    const result = await sendEmail({
       from: getFromEmail(),
       to: input.email,
       subject: `Welcome to ${APP_NAME}`,
       html,
     });
 
-    if (result.error) {
-      console.error("Welcome email failed", {
-        email: input.email,
-        error: result.error,
-      });
-      return { sent: false, reason: result.error.message };
-    }
-
     console.info("Welcome email sent", {
       email: input.email,
-      resendId: result.data?.id,
+      messageId: result.id,
+      provider: result.provider,
     });
 
     return { sent: true };

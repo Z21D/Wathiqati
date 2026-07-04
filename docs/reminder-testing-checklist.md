@@ -17,10 +17,14 @@ Required `.env` values:
 
 ```bash
 DATABASE_URL="..."
-RESEND_API_KEY="..."
-RESEND_FROM_EMAIL="Wathiqati <onboarding@resend.dev>"
+EMAIL_PROVIDER="gmail"
+GMAIL_USER="youraddress@gmail.com"
+GMAIL_APP_PASSWORD="your-google-app-password"
 CRON_SECRET="..."
 ```
+
+Use `EMAIL_PROVIDER=resend` with `RESEND_API_KEY` and `RESEND_FROM_EMAIL` when
+testing the production Resend path.
 
 ## 1. Seed Real-World Scenarios
 

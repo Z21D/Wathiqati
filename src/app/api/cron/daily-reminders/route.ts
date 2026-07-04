@@ -6,6 +6,10 @@ import {
   sendOrganizationDigest,
   type HealthyReportFrequency,
 } from "@/lib/email/digest";
+import {
+  getActiveEmailProvider,
+  getEmailProviderConfigurationError,
+} from "@/lib/email/client";
 
 // Pick one recipient per organization: prefer the OWNER, then ADMIN, then any
 // member that has email reminders enabled and a deliverable address.
@@ -23,7 +27,8 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (!process.env.RESEND_API_KEY) {
+  const configurationError = getEmailProviderConfigurationError();
+  if (configurationError) {
     return NextResponse.json({
       ok: true,
       organizations: 0,
@@ -31,7 +36,8 @@ export async function GET(request: Request) {
       healthySent: 0,
       skipped: 0,
       failed: 0,
-      message: "RESEND_API_KEY not configured",
+      message: configurationError,
+      emailProvider: getActiveEmailProvider(),
     });
   }
 

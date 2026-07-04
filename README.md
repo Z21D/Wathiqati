@@ -9,7 +9,7 @@ Wathiqati (وثيقتي, "My Document") is a modern SaaS for tracking company do
 - Automatic expiry statuses: Valid, Expiring soon (30 days), Urgent (7 days), Expired
 - Excel import with merge behavior (company + document + number)
 - Dashboard with metrics, upcoming expiries, alerts, and recent imports
-- Email reminders via Resend + Vercel Cron (optional)
+- Email reminders via Gmail in development or Resend in production + Vercel Cron (optional)
 
 ## Tech stack
 
@@ -18,7 +18,8 @@ Wathiqati (وثيقتي, "My Document") is a modern SaaS for tracking company do
 - Tailwind CSS
 - Prisma + PostgreSQL (Neon)
 - Auth.js v5
-- Resend (email)
+- Gmail/Nodemailer for development email
+- Resend for production email
 - xlsx (Excel import)
 
 ## Local development
@@ -43,8 +44,13 @@ Fill in:
 
 Optional for email reminders:
 
-- `RESEND_API_KEY`
-- `RESEND_FROM_EMAIL`
+- `EMAIL_PROVIDER=gmail` for development or `EMAIL_PROVIDER=resend` for production
+- Gmail development:
+  - `GMAIL_USER`
+  - `GMAIL_APP_PASSWORD` (Google account App Password, not your normal Gmail password)
+- Resend production:
+  - `RESEND_API_KEY`
+  - `RESEND_FROM_EMAIL`
 - `CRON_SECRET`
 
 ### 3. Push database schema
@@ -87,15 +93,33 @@ After deploy:
 npx prisma db push
 ```
 
-### Vercel Cron + Resend
+### Vercel Cron + Email Providers
 
-`vercel.json` schedules `/api/cron/check-expiry` daily at 08:00 UTC.
+`vercel.json` schedules `/api/cron/check-expiry` and
+`/api/cron/daily-reminders` daily at 08:00 UTC.
 
 Set these in Vercel:
 
 - `CRON_SECRET` — random secret; Vercel sends `Authorization: Bearer <CRON_SECRET>`
+- `EMAIL_PROVIDER=resend`
 - `RESEND_API_KEY`
 - `RESEND_FROM_EMAIL`
+
+For local development, you can temporarily use Gmail instead of Resend:
+
+```env
+EMAIL_PROVIDER=gmail
+GMAIL_USER="youraddress@gmail.com"
+GMAIL_APP_PASSWORD="your-google-app-password"
+```
+
+For production, keep Resend:
+
+```env
+EMAIL_PROVIDER=resend
+RESEND_API_KEY="..."
+RESEND_FROM_EMAIL="Wathiqati <no-reply@yourdomain.com>"
+```
 
 Email reminders can be configured per user in Settings. The default schedule is:
 
@@ -118,7 +142,7 @@ Users can disable email reminders or customize the schedule from
 
 ### Test email locally
 
-After adding `RESEND_API_KEY` and `RESEND_FROM_EMAIL` to `.env`, send a sample email:
+After configuring either Gmail or Resend in `.env`, send a sample email:
 
 ```bash
 npm run email:test -- you@example.com
@@ -133,7 +157,7 @@ This command sends a standalone sample email and does not create fake documents 
 | `npm run dev` | Start dev server |
 | `npm run build` | Production build |
 | `npm run start` | Start production server |
-| `npm run email:test -- you@example.com` | Send a local Resend test email |
+| `npm run email:test -- you@example.com` | Send a local test email through the active email provider |
 | `npm run lint` | ESLint |
 | `npx prisma db push` | Sync schema to database |
 | `npx prisma studio` | Database GUI |

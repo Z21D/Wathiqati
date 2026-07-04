@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { buildDocumentAlerts, getDocumentsForOrganization } from "@/lib/documents";
 import { sendExpiryReminderEmail } from "@/lib/email/send-reminder";
+import {
+  getEmailProviderConfigurationError,
+  getActiveEmailProvider,
+} from "@/lib/email/client";
 import { parseReminderSchedule } from "@/lib/document-status";
 
 export async function GET(request: Request) {
@@ -12,12 +16,14 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (!process.env.RESEND_API_KEY) {
+  const configurationError = getEmailProviderConfigurationError();
+  if (configurationError) {
     return NextResponse.json({
       ok: true,
       sent: 0,
       skipped: 0,
-      message: "RESEND_API_KEY not configured",
+      message: configurationError,
+      emailProvider: getActiveEmailProvider(),
     });
   }
 

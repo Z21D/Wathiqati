@@ -1,4 +1,9 @@
-import { APP_NAME, getFromEmail, getResendClient } from "@/lib/email/client";
+import {
+  APP_NAME,
+  getEmailProviderConfigurationError,
+  getFromEmail,
+  sendEmail,
+} from "@/lib/email/client";
 import { emailLayout } from "@/lib/email/templates";
 
 export async function sendAccountDeletedEmail(input: {
@@ -6,9 +11,9 @@ export async function sendAccountDeletedEmail(input: {
   name?: string | null;
   deletedAt: Date;
 }): Promise<{ sent: boolean; reason?: string }> {
-  const resend = getResendClient();
-  if (!resend) {
-    return { sent: false, reason: "RESEND_API_KEY not configured" };
+  const configurationError = getEmailProviderConfigurationError();
+  if (configurationError) {
+    return { sent: false, reason: configurationError };
   }
 
   const supportEmail = process.env.SUPPORT_EMAIL ?? "support@wathiqati.com";
@@ -45,7 +50,7 @@ export async function sendAccountDeletedEmail(input: {
   });
 
   try {
-    await resend.emails.send({
+    await sendEmail({
       from: getFromEmail(),
       to: input.email,
       subject: `Your ${APP_NAME} account has been deleted`,

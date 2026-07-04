@@ -1,5 +1,11 @@
 import { prisma } from "@/lib/prisma";
-import { getFromEmail, getResendClient, APP_NAME, getAppUrl } from "@/lib/email/client";
+import {
+  APP_NAME,
+  getAppUrl,
+  getEmailProviderConfigurationError,
+  getFromEmail,
+  sendEmail,
+} from "@/lib/email/client";
 import type { DocumentAlert } from "@/lib/documents";
 import {
   getReminderKeyForDays,
@@ -52,9 +58,9 @@ export async function sendExpiryReminderEmail(input: {
     now: input.now ?? new Date(),
   });
 
-  const resend = getResendClient();
-  if (!resend) {
-    return { sent: false, reason: "RESEND_API_KEY not configured" };
+  const configurationError = getEmailProviderConfigurationError();
+  if (configurationError) {
+    return { sent: false, reason: configurationError };
   }
 
   const alreadySent = await wasReminderSent(
@@ -92,16 +98,12 @@ export async function sendExpiryReminderEmail(input: {
   `;
 
   try {
-    const result = await resend.emails.send({
+    await sendEmail({
       from: getFromEmail(),
       to: input.userEmail,
       subject,
       html,
     });
-
-    if (result.error) {
-      throw new Error(result.error.message);
-    }
 
     await prisma.notificationLog.create({
       data: {

@@ -1,14 +1,23 @@
 import "dotenv/config";
+import nodemailer from "nodemailer";
 import { Resend } from "resend";
 
 const appName = "Wathiqati";
 const to = process.argv[2] ?? process.env.RESEND_TEST_TO;
-const apiKey = process.env.RESEND_API_KEY;
-const from = process.env.RESEND_FROM_EMAIL ?? `${appName} <onboarding@resend.dev>`;
+const provider = process.env.EMAIL_PROVIDER === "gmail" ? "gmail" : "resend";
+const from =
+  provider === "gmail"
+    ? `${appName} <${process.env.GMAIL_USER ?? "gmail-not-configured@example.com"}>`
+    : process.env.RESEND_FROM_EMAIL ?? `${appName} <onboarding@resend.dev>`;
 const appUrl = process.env.AUTH_URL ?? "http://localhost:3000";
 
-if (!apiKey) {
+if (provider === "resend" && !process.env.RESEND_API_KEY) {
   console.error("Missing RESEND_API_KEY in .env");
+  process.exit(1);
+}
+
+if (provider === "gmail" && (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD)) {
+  console.error("Gmail provider requires GMAIL_USER and GMAIL_APP_PASSWORD in .env");
   process.exit(1);
 }
 
@@ -18,9 +27,7 @@ if (!to) {
   process.exit(1);
 }
 
-const resend = new Resend(apiKey);
-
-const result = await resend.emails.send({
+const message = {
   from,
   to,
   subject: `[${appName}] Sample reminder email`,
@@ -43,12 +50,32 @@ const result = await resend.emails.send({
       </div>
     </div>
   `,
-});
+};
 
-if (result.error) {
-  console.error("Resend error:", result.error);
-  process.exit(1);
+let id = "unknown";
+
+if (provider === "gmail") {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.GMAIL_USER,
+      pass: process.env.GMAIL_APP_PASSWORD,
+    },
+  });
+  const result = await transporter.sendMail(message);
+  id = result.messageId ?? "unknown";
+} else {
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const result = await resend.emails.send(message);
+
+  if (result.error) {
+    console.error("Resend error:", result.error);
+    process.exit(1);
+  }
+
+  id = result.data?.id ?? "unknown";
 }
 
 console.log("Sample email sent successfully.");
-console.log("Resend id:", result.data?.id ?? "unknown");
+console.log("Provider:", provider);
+console.log("Message id:", id);
