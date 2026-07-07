@@ -66,6 +66,14 @@ export function LoginForm({ googleEnabled = false }: { googleEnabled?: boolean }
             required
             autoComplete="current-password"
           />
+          <div className="flex justify-end">
+            <Link
+              href="/forgot-password"
+              className="text-sm font-medium text-brand-600 hover:underline"
+            >
+              Forgot password?
+            </Link>
+          </div>
           {state.error && (
             <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
               {state.error}

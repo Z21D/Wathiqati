@@ -18,7 +18,10 @@ export const authConfig = {
       }
 
       const isAuthPage =
-        nextUrl.pathname === "/login" || nextUrl.pathname === "/register";
+        nextUrl.pathname === "/login" ||
+        nextUrl.pathname === "/register" ||
+        nextUrl.pathname === "/forgot-password" ||
+        nextUrl.pathname === "/reset-password";
 
       if (isLoggedIn && isAuthPage) {
         return Response.redirect(new URL("/home", nextUrl));

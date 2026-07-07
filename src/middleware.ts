@@ -9,6 +9,8 @@ export const config = {
     "/dashboard/:path*",
     "/login",
     "/register",
+    "/forgot-password",
+    "/reset-password",
     "/api/protected/:path*",
   ],
 };
