@@ -55,6 +55,10 @@ export async function sendAccountDeletedEmail(input: {
       to: input.email,
       subject: `Your ${APP_NAME} account has been deleted`,
       html,
+      tracking: {
+        emailType: "ACCOUNT_DELETED",
+        metadata: { deletedAt: input.deletedAt.toISOString() },
+      },
     });
 
     return { sent: true };

@@ -3,7 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { googleSignInAction } from "@/lib/actions/auth";
+import {
+  AuthMethodDivider,
+  GoogleSignInButton,
+} from "@/components/auth/google-sign-in-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -18,9 +21,11 @@ import { brand } from "@/lib/brand";
 export function RegisterForm({
   initialEmail = "",
   googleEnabled = false,
+  oauthError = null,
 }: {
   initialEmail?: string;
   googleEnabled?: boolean;
+  oauthError?: string | null;
 }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -69,21 +74,16 @@ export function RegisterForm({
           Start managing document expiry with {brand.name}
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
         {googleEnabled && (
-          <form action={googleSignInAction} className="mb-4">
-            <Button type="submit" variant="outline" className="w-full">
-              Continue with Google
-            </Button>
-          </form>
+          <>
+            <GoogleSignInButton label="Sign up with Google" />
+            <p className="text-center text-xs text-ink-tertiary">
+              We&apos;ll create your workspace automatically after Google sign-in.
+            </p>
+            <AuthMethodDivider />
+          </>
         )}
-        <div className="mb-4 flex items-center gap-3">
-          <div className="h-px flex-1 bg-[#e5e5ea]" />
-          <span className="text-xs font-medium uppercase tracking-wide text-ink-tertiary">
-            Continue with email
-          </span>
-          <div className="h-px flex-1 bg-[#e5e5ea]" />
-        </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
             label="Full name"
@@ -115,16 +115,16 @@ export function RegisterForm({
             required
             autoComplete="new-password"
           />
-          {error && (
+          {(oauthError || error) && (
             <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
-              {error}
+              {oauthError ?? error}
             </p>
           )}
           <Button type="submit" className="w-full" disabled={pending}>
-            {pending ? "Creating account…" : "Create account"}
+            {pending ? "Creating account…" : "Create account with email"}
           </Button>
         </form>
-        <p className="mt-6 text-center text-sm text-slate-600">
+        <p className="text-center text-sm text-slate-600">
           Already have an account?{" "}
           <Link href="/login" className="font-medium text-brand-600 hover:underline">
             Sign in

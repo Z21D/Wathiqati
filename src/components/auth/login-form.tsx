@@ -2,11 +2,11 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
+import { loginAction, type AuthActionState } from "@/lib/actions/auth";
 import {
-  googleSignInAction,
-  loginAction,
-  type AuthActionState,
-} from "@/lib/actions/auth";
+  AuthMethodDivider,
+  GoogleSignInButton,
+} from "@/components/auth/google-sign-in-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -20,7 +20,13 @@ import { brand } from "@/lib/brand";
 
 const initialState: AuthActionState = {};
 
-export function LoginForm({ googleEnabled = false }: { googleEnabled?: boolean }) {
+export function LoginForm({
+  googleEnabled = false,
+  oauthError = null,
+}: {
+  googleEnabled?: boolean;
+  oauthError?: string | null;
+}) {
   const [state, formAction, pending] = useActionState(
     loginAction,
     initialState
@@ -32,22 +38,15 @@ export function LoginForm({ googleEnabled = false }: { googleEnabled?: boolean }
         <CardTitle>Welcome back</CardTitle>
         <CardDescription>Sign in to your {brand.name} account</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
         {googleEnabled && (
-          <form action={googleSignInAction} className="mb-4">
-            <Button type="submit" variant="outline" className="w-full">
-              Continue with Google
-            </Button>
-          </form>
-        )}
-        {googleEnabled && (
-          <div className="mb-4 flex items-center gap-3">
-            <div className="h-px flex-1 bg-[#e5e5ea]" />
-            <span className="text-xs font-medium uppercase tracking-wide text-ink-tertiary">
-              Continue with email
-            </span>
-            <div className="h-px flex-1 bg-[#e5e5ea]" />
-          </div>
+          <>
+            <GoogleSignInButton />
+            <p className="text-center text-xs text-ink-tertiary">
+              Sign in with Google — no password required.
+            </p>
+            <AuthMethodDivider />
+          </>
         )}
         <form action={formAction} className="space-y-4">
           <Input
@@ -74,16 +73,16 @@ export function LoginForm({ googleEnabled = false }: { googleEnabled?: boolean }
               Forgot password?
             </Link>
           </div>
-          {state.error && (
+          {(oauthError || state.error) && (
             <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
-              {state.error}
+              {oauthError ?? state.error}
             </p>
           )}
           <Button type="submit" className="w-full" disabled={pending}>
-            {pending ? "Signing in…" : "Sign in"}
+            {pending ? "Signing in…" : "Sign in with email"}
           </Button>
         </form>
-        <p className="mt-6 text-center text-sm text-slate-600">
+        <p className="text-center text-sm text-slate-600">
           Don&apos;t have an account?{" "}
           <Link href="/register" className="font-medium text-brand-600 hover:underline">
             Create one

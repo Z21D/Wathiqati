@@ -47,6 +47,12 @@ export async function sendWelcomeEmail(input: {
       to: input.email,
       subject: `Welcome to ${APP_NAME}`,
       html,
+      tracking: {
+        emailType: "WELCOME",
+        metadata: {
+          organizationName: input.organizationName ?? null,
+        },
+      },
     });
 
     console.info("Welcome email sent", {

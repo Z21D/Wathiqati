@@ -197,7 +197,7 @@ export async function sendOrganizationDigest(input: {
   digest: OrganizationDigest;
   healthyReportFrequency: HealthyReportFrequency;
   now?: Date;
-}): Promise<{ sent: boolean; kind: "digest" | "healthy" | "none"; reason?: string }> {
+}): Promise<{ sent: boolean; kind: "digest" | "healthy" | "none"; reason?: string; messageId?: string }> {
   const now = input.now ?? new Date();
   const configurationError = getEmailProviderConfigurationError();
   if (configurationError) {
@@ -243,11 +243,18 @@ export async function sendOrganizationDigest(input: {
         });
 
   try {
-    await sendEmail({
+    const result = await sendEmail({
       from: getFromEmail(),
       to: input.recipientEmail,
       subject,
       html,
+      tracking: {
+        emailType: kind === "healthy" ? "HEALTHY_REPORT" : "DAILY_DIGEST",
+        organizationId: input.organizationId,
+        userId: input.userId,
+        documentId: DIGEST_DOCUMENT_SENTINEL,
+        metadata: { reminderKey, kind },
+      },
     });
 
     await prisma.notificationLog.create({
@@ -262,7 +269,7 @@ export async function sendOrganizationDigest(input: {
       },
     });
 
-    return { sent: true, kind };
+    return { sent: true, kind, messageId: result.id };
   } catch (error) {
     await prisma.notificationLog.create({
       data: {

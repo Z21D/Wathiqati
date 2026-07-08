@@ -7,6 +7,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { authConfig } from "@/lib/auth.config";
 import { loginSchema } from "@/lib/validations/auth";
+import { provisionOAuthUserIfNeeded } from "@/lib/auth/onboarding";
 
 const providers: Provider[] = [
   Credentials({
@@ -46,6 +47,7 @@ if (process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET) {
     Google({
       clientId: process.env.AUTH_GOOGLE_ID,
       clientSecret: process.env.AUTH_GOOGLE_SECRET,
+      allowDangerousEmailAccountLinking: true,
     })
   );
 }
@@ -54,4 +56,27 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   ...authConfig,
   providers,
+  events: {
+    async createUser({ user }) {
+      if (!user.id) {
+        return;
+      }
+
+      await provisionOAuthUserIfNeeded({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      });
+    },
+    async linkAccount({ user, account }) {
+      if (account.provider !== "google") {
+        return;
+      }
+
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { emailVerified: new Date() },
+      });
+    },
+  },
 });

@@ -98,11 +98,21 @@ export async function sendExpiryReminderEmail(input: {
   `;
 
   try {
-    await sendEmail({
+    const result = await sendEmail({
       from: getFromEmail(),
       to: input.userEmail,
       subject,
       html,
+      tracking: {
+        emailType: "EXPIRY_REMINDER",
+        organizationId: input.organizationId,
+        userId: input.userId,
+        documentId: input.alert.id,
+        metadata: {
+          alertType: input.alert.status,
+          reminderKey: logReminderKey,
+        },
+      },
     });
 
     await prisma.notificationLog.create({
@@ -116,6 +126,8 @@ export async function sendExpiryReminderEmail(input: {
         status: "SENT",
       },
     });
+
+    return { sent: true, messageId: result.id };
   } catch (error) {
     await prisma.notificationLog.create({
       data: {
@@ -132,8 +144,6 @@ export async function sendExpiryReminderEmail(input: {
 
     throw error;
   }
-
-  return { sent: true };
 }
 
 function getNotificationLogReminderKey({

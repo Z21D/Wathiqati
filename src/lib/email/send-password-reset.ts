@@ -45,6 +45,10 @@ export async function sendPasswordResetEmail(input: {
       to: input.email,
       subject: `Reset your ${APP_NAME} password`,
       html,
+      tracking: {
+        emailType: "PASSWORD_RESET",
+        metadata: { source: "password-reset" },
+      },
     });
 
     console.info("Password reset email sent", {

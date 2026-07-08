@@ -2,30 +2,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { registerSchema } from "@/lib/validations/auth";
-import { sendWelcomeEmail } from "@/lib/email/send-welcome";
-
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, "")
-    .replace(/[\s_-]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
-async function uniqueSlug(base: string): Promise<string> {
-  const slug = slugify(base);
-  let suffix = 0;
-
-  while (true) {
-    const candidate = suffix === 0 ? slug : `${slug}-${suffix}`;
-    const existing = await prisma.organization.findUnique({
-      where: { slug: candidate },
-    });
-    if (!existing) return candidate;
-    suffix++;
-  }
-}
+import { sendWelcomeEmailOnce, uniqueSlug } from "@/lib/auth/onboarding";
 
 export async function POST(request: Request) {
   try {
@@ -86,23 +63,12 @@ export async function POST(request: Request) {
       return user.id;
     });
 
-    // Best-effort welcome email — never block or fail signup on email errors.
-    try {
-      const result = await sendWelcomeEmail({
-        name,
-        email: normalizedEmail,
-        organizationName,
-      });
-
-      if (result.sent) {
-        await prisma.user.update({
-          where: { id: createdUserId },
-          data: { welcomeEmailSentAt: new Date() },
-        });
-      }
-    } catch (error) {
-      console.error("Welcome email dispatch failed", error);
-    }
+    await sendWelcomeEmailOnce({
+      userId: createdUserId,
+      name,
+      email: normalizedEmail,
+      organizationName,
+    });
 
     return NextResponse.json({ success: true }, { status: 201 });
   } catch (error) {

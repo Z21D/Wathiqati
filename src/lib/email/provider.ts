@@ -1,6 +1,13 @@
 import nodemailer from "nodemailer";
 import { Resend } from "resend";
 import { APP_NAME } from "@/lib/brand";
+import {
+  buildFailureOutcome,
+  buildSuccessOutcome,
+  createEmailLog,
+  trackingToLogInput,
+} from "@/lib/email/email-log";
+import type { EmailTrackingContext } from "@/lib/email/types";
 
 export type EmailProvider = "resend" | "gmail";
 
@@ -9,11 +16,15 @@ export type SendEmailInput = {
   subject: string;
   html: string;
   from?: string;
+  tracking?: EmailTrackingContext;
 };
 
 export type SendEmailResult = {
   id?: string;
   provider: EmailProvider;
+  providerResponse?: string;
+  smtpResponse?: string;
+  smtpCode?: number;
 };
 
 let resendClient: Resend | null = null;
@@ -67,11 +78,46 @@ export function getEmailProviderConfigurationError() {
 export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult> {
   const provider = getActiveEmailProvider();
 
-  if (provider === "gmail") {
-    return sendWithGmail(input);
-  }
+  try {
+    const result =
+      provider === "gmail"
+        ? await sendWithGmail(input)
+        : await sendWithResend(input);
 
-  return sendWithResend(input);
+    if (input.tracking) {
+      await createEmailLog(
+        trackingToLogInput(
+          {
+            to: input.to,
+            subject: input.subject,
+            html: input.html,
+            provider,
+          },
+          input.tracking
+        ),
+        buildSuccessOutcome(provider, result)
+      );
+    }
+
+    return result;
+  } catch (error) {
+    if (input.tracking) {
+      await createEmailLog(
+        trackingToLogInput(
+          {
+            to: input.to,
+            subject: input.subject,
+            html: input.html,
+            provider,
+          },
+          input.tracking
+        ),
+        buildFailureOutcome(error)
+      );
+    }
+
+    throw error;
+  }
 }
 
 async function sendWithResend(input: SendEmailInput): Promise<SendEmailResult> {
@@ -97,6 +143,7 @@ async function sendWithResend(input: SendEmailInput): Promise<SendEmailResult> {
   return {
     id: result.data?.id,
     provider: "resend",
+    providerResponse: JSON.stringify(result.data ?? {}),
   };
 }
 
@@ -122,10 +169,21 @@ async function sendWithGmail(input: SendEmailInput): Promise<SendEmailResult> {
     html: input.html,
   });
 
+  const smtpCode = parseSmtpCode(result.response);
+
   return {
     id: result.messageId,
     provider: "gmail",
+    providerResponse: result.response,
+    smtpResponse: result.response,
+    smtpCode,
   };
+}
+
+function parseSmtpCode(response?: string) {
+  if (!response) return undefined;
+  const match = response.match(/^(\d{3})/);
+  return match ? Number(match[1]) : undefined;
 }
 
 export { APP_NAME };

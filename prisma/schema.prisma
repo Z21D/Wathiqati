@@ -28,6 +28,7 @@ model User {
   sessions      Session[]
   memberships   OrganizationMember[]
   passwordResetTokens PasswordResetToken[]
+  emailLogs     EmailLog[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
@@ -98,6 +99,7 @@ model Organization {
   companies Company[]
   documents Document[]
   importLogs ImportLog[]
+  emailLogs  EmailLog[]
   createdAt DateTime             @default(now())
   updatedAt DateTime             @updatedAt
 }
@@ -189,6 +191,39 @@ model AlertRead {
 
   @@unique([documentId, userId, alertKey])
   @@index([organizationId, userId])
+}
+
+model EmailLog {
+  id                 String    @id @default(cuid())
+  organizationId     String?
+  userId             String?
+  recipient          String
+  subject            String
+  bodyPreview        String?   @db.Text
+  htmlContent        String?   @db.Text
+  emailType          String
+  provider           String
+  providerMessageId  String?
+  providerResponse   String?   @db.Text
+  status             String
+  deliveryStatus     String    @default("UNKNOWN")
+  error              String?   @db.Text
+  smtpResponse       String?   @db.Text
+  smtpCode           Int?
+  deliveredAt        DateTime?
+  documentId         String?
+  metadata           Json?
+  organization       Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  user               User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@index([organizationId, createdAt])
+  @@index([userId, createdAt])
+  @@index([emailType, createdAt])
+  @@index([providerMessageId])
+  @@index([status, createdAt])
+  @@index([deliveryStatus])
 }
 
 enum UserRole {

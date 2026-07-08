@@ -7,3 +7,4 @@ export {
   isEmailProviderConfigured,
   sendEmail,
 } from "@/lib/email/provider";
+export type { EmailTrackingContext, EmailType } from "@/lib/email/types";

@@ -6,6 +6,7 @@ import { DashboardHeader } from "@/components/dashboard/header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { NotificationSettingsForm } from "@/components/settings/notification-settings-form";
 import { DangerZone } from "@/components/settings/danger-zone";
+import { ButtonLink } from "@/components/ui/button";
 
 export const metadata: Metadata = {
   title: "Settings",
@@ -29,6 +30,8 @@ export default async function SettingsPage() {
 
   const accountEmail = user?.email ?? session?.user.email ?? "";
   const productionRecipient = user?.notificationEmail || accountEmail;
+  const canAccessEmailCenter =
+    membership?.role === "OWNER" || membership?.role === "ADMIN";
 
   return (
     <>
@@ -74,6 +77,22 @@ export default async function SettingsPage() {
             />
           </CardContent>
         </Card>
+
+        {canAccessEmailCenter && (
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle>Email Center</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm text-ink-secondary">
+                Monitor delivery, send test emails, run reminder simulations, and review email history.
+              </p>
+              <ButtonLink href="/dashboard/settings/email" variant="secondary">
+                Open Email Center
+              </ButtonLink>
+            </CardContent>
+          </Card>
+        )}
 
         <Card className="lg:col-span-2">
           <CardHeader>
